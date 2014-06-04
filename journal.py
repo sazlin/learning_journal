@@ -5,6 +5,7 @@ import psycopg2
 from contextlib import closing
 from flask import g
 import datetime
+from flask import render_template
 
 DB_SCHEMA = """
 DROP TABLE IF EXISTS entries;
@@ -17,7 +18,7 @@ CREATE TABLE entries (
 """
 app = Flask(__name__)
 app.config['DATABASE'] = os.environ.get(
-    'DATABASE_URL', 'dbname=learning_journal user=sazlin'
+    'DATABASE_URL', 'dbname=learning_journal'
 )
 DB_ENTRY_INSERT = """
 INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
@@ -82,8 +83,9 @@ def write_entry(title, text):
 
 
 @app.route('/')
-def hello():
-    return u'Hello world!'
+def show_entries():
+    entries = get_all_entries()
+    return render_template('list_entries.html', entries=entries)
 
 if __name__ == '__main__':
     app.run(debug=True)

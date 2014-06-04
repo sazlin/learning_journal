@@ -21,3 +21,14 @@ def test_app():
     """configure our app for use in testing"""
     app.config['DATABASE'] = TEST_DSN
     app.config['TESTING'] = True
+
+
+@pytest.fixture(scope='session')
+def db(test_app, request):
+    """initialize the entries table and drop it when finished"""
+    init_db()
+
+    def cleanup():
+        clear_db()
+
+    request.addfinalizer(cleanup)

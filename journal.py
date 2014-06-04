@@ -4,6 +4,7 @@ import os
 import psycopg2
 from contextlib import closing
 from flask import g
+import datetime
 
 DB_SCHEMA = """
 DROP TABLE IF EXISTS entries;
@@ -18,6 +19,21 @@ app = Flask(__name__)
 app.config['DATABASE'] = os.environ.get(
     'DATABASE_URL', 'dbname=learning_journal user=sazlin'
 )
+DB_ENTRY_INSERT = """
+INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
+"""
+DB_ENTRIES_LIST = """
+SELECT id, title, text, created FROM entries ORDER BY created DESC
+"""
+
+
+def get_all_entries():
+    """return a list of all entries as dicts"""
+    con = get_database_connection()
+    cur = con.cursor()
+    cur.execute(DB_ENTRIES_LIST)
+    keys = ('id', 'title', 'text', 'created')
+    return [dict(zip(keys, row)) for row in cur.fetchall()]
 
 
 def connect_db():
@@ -54,6 +70,15 @@ def teardown_request(exception):
             # otherwise, commit
             db.commit()
         db.close()
+
+
+def write_entry(title, text):
+    if not title or not text:
+        raise ValueError("Title and text required for writing an entry")
+    con = get_database_connection()
+    cur = con.cursor()
+    now = datetime.datetime.utcnow()
+    cur.execute(DB_ENTRY_INSERT, [title, text, now])
 
 
 @app.route('/')

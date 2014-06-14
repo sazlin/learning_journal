@@ -46,9 +46,10 @@ def req_context(db):
 @pytest.fixture(scope='function')
 def with_entry(db, request):
     from journal import write_entry
-    expected = (u'Test Title', u'Test Text')
+    markdown_input = (u'Test Title', u'#Test Text')
+    expected = (u'Test Title', u'<h1>Test Text</h1>')
     with app.test_request_context('/'):
-        write_entry(*expected)
+        write_entry(*markdown_input)
         # manually commit transaction here to avoid rollback due to
         # handled exceptions
         get_database_connection().commit()

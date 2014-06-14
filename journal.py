@@ -111,6 +111,9 @@ def write_entry(title, text):
 @app.route('/')
 def show_entries():
     entries = get_all_entries()
+    import markdown
+    for entry in entries:
+        entry['text'] = markdown.markdown(entry['text'])  # markdown -> html
     return render_template('list_entries.html', entries=entries)
 
 

@@ -82,7 +82,9 @@ def get_entry(post_id):
     cur.execute(DB_ENTRY_GET, (post_id,))
     keys = ('id', 'title', 'text', 'created')
     fetched = cur.fetchall()[0]
-    return {keys[i]: fetched[i] for i in xrange(len(keys))}
+    entry = {keys[i]: fetched[i] for i in xrange(len(keys))}
+    entry['html'] = _markdown(entry['text'])
+    return entry
 
 
 # This is new as of Editing

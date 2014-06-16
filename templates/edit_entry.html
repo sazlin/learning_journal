@@ -10,7 +10,7 @@
         </div>
         <div class="field">
           <label for="text">Text</label>
-          <textarea name="text" id="text" rows="5" cols="80" placeholder="{{ entry.text }}" required="required"></textarea>
+          <textarea name="text" id="text" rows="5" cols="80" required="required">{{ entry.text }}</textarea>
         </div>
         <div class="control_row">
           <input type="submit" value="Edit" name="Edit"/>
@@ -21,7 +21,7 @@
       <h3>{{ entry.title }}</h3>
       <p class="dateline">{{ entry.created.strftime('%b. %d, %Y') }}
       <div class="entry_body">
-        {{ entry.text|safe }}
+        {{ entry.html |safe }}
       </div>
     {% else %}
     <div class="entry">

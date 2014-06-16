@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    {% if entry %}
+      <aside>
+      <form method="POST" class="edit_entry">
+        <div class="field">
+          <label for="title">Title</label>
+          <input type="text" size="30" name="title" id="title" value="{{ entry.title }}" required="required"/>
+        </div>
+        <div class="field">
+          <label for="text">Text</label>
+          <textarea name="text" id="text" rows="5" cols="80" required="required">{{ entry.text }}</textarea>
+        </div>
+        <div class="control_row">
+          <input type="submit" value="Edit" name="Edit"/>
+        </div>
+      </form>
+      </aside>
+      <article class="entry" id="entry={{entry.id}}">
+      <h3>{{ entry.title }}</h3>
+      <p class="dateline">{{ entry.created.strftime('%b. %d, %Y') }}
+      <div class="entry_body">
+        {{ entry.html |safe }}
+      </div>
+    {% else %}
+    <div class="entry">
+      <p><em>No entries with that number</em></p>
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="entry">
+      <p><em>You must be logged in to access this page.</em></p>
+    </div>
+  {% endif %}
+{% endblock %}

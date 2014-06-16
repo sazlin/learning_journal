@@ -25,6 +25,13 @@
     <div class="entry_body">
       {{ entry.text|safe }}
     </div>
+    {% if session.logged_in %}
+    <form action="{{ url_for('edit_post', post_id=entry.id) }}" method="LINK">
+    <div class="control_row">
+      <input type="submit" name="Edit" value="Edit"/>
+    </div>
+    </form>
+    {% endif %}
   </article>
   {% else %}
   <div class="entry">

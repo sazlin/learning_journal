@@ -12,6 +12,7 @@ from flask import url_for
 from flask import redirect
 from flask import session
 from passlib.hash import pbkdf2_sha256
+import markdown
 
 DB_SCHEMA = """
 DROP TABLE IF EXISTS entries;
@@ -42,6 +43,56 @@ INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
 DB_ENTRIES_LIST = """
 SELECT id, title, text, created FROM entries ORDER BY created DESC
 """
+
+# This is new as of Editing
+DB_ENTRY_GET = """
+SELECT * FROM entries WHERE id = %s
+"""
+
+# This is new as of Editing
+DB_ENTRY_EDIT = """
+UPDATE entries
+SET title = %s, text = %s, created = %s
+WHERE id = %s
+"""
+
+
+# This is new as of Editing
+def _markdown(text):
+    return markdown.markdown(text, extensions=["codehilite"])
+
+
+# This is new as of Editing
+@app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    entry = get_entry(post_id)
+    if request.method == 'POST':
+        try:
+            edit_entry(post_id, request.form['title'], request.form['text'])
+            return redirect(url_for('show_entries'))
+        except psycopg2.Error:
+            abort(500)
+    return render_template('edit_entry.html', entry=entry)
+
+
+# This is new as of Editing
+def get_entry(post_id):
+    con = get_database_connection()
+    cur = con.cursor()
+    cur.execute(DB_ENTRY_GET, (post_id,))
+    keys = ('id', 'title', 'text', 'created')
+    fetched = cur.fetchall()[0]
+    return {keys[i]: fetched[i] for i in xrange(len(keys))}
+
+
+# This is new as of Editing
+def edit_entry(post_id, title, text):
+    if not title or not text:
+        raise ValueError("Title and text required for writing an entry")
+    con = get_database_connection()
+    cur = con.cursor()
+    now = datetime.datetime.utcnow()
+    cur.execute(DB_ENTRY_EDIT, (title, text, now, post_id))
 
 
 @app.route('/add', methods=['POST'])
@@ -111,9 +162,8 @@ def write_entry(title, text):
 @app.route('/')
 def show_entries():
     entries = get_all_entries()
-    import markdown
     for entry in entries:
-        entry['text'] = markdown.markdown(entry['text'])  # markdown -> html
+        entry['text'] = _markdown(entry['text'])  # markdown -> html
     return render_template('list_entries.html', entries=entries)
 
 

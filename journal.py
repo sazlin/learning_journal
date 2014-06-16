@@ -65,6 +65,10 @@ def _markdown(text):
 # This is new as of Editing
 @app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
 def edit_post(post_id):
+    if not post_id or logged_in not in session or \
+        session['logged_in'] is False:
+            return redirect(url_for('show_entries'))
+
     entry = get_entry(post_id)
     if request.method == 'POST':
         try:

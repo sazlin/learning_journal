@@ -68,6 +68,36 @@ def with_entry(db, request):
 SUBMIT_BTN = '<input type="submit" value="Share" name="Share"/>'
 
 
+def test_get_entry(req_context):
+    from journal import write_entry
+    from journal import get_entry
+
+    markdown_input = (u'Test Title', u'#Test Text')
+    expected_html = u'<h1>Test Text</h1>'
+    write_entry(markdown_input[0], markdown_input[1])
+    rows = run_independent_query("SELECT id FROM entries")
+    entry = get_entry(rows[0])
+    assert entry['text'] == markdown_input[1]
+    assert entry['title'] == markdown_input[0]
+    assert entry['html'] == expected_html
+
+
+def test_edit_entry(req_context):
+    from journal import write_entry
+    from journal import get_entry
+    from journal import edit_entry
+
+    markdown_input = (u'Test Title', u'#Test Text')
+    write_entry(markdown_input[0], markdown_input[1])
+    rows = run_independent_query("SELECT id FROM entries")
+    entry = get_entry(rows[0])
+    new_strings = (u'New Title', u'New Text')
+    edit_entry(entry['id'], *new_strings)
+    entry = get_entry(rows[0])
+    assert entry['text'] == new_strings[1]
+    assert entry['title'] == new_strings[0]
+
+
 def login_helper(username, password):
     login_data = {
         'username': username, 'password': password

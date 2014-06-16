@@ -68,7 +68,7 @@ def with_entry(db, request):
 SUBMIT_BTN = '<input type="submit" value="Share" name="Share"/>'
 
 
-def test_get_entry(req_context):
+def test_get_entry_1(req_context):
     from journal import write_entry
     from journal import get_entry
 
@@ -80,6 +80,11 @@ def test_get_entry(req_context):
     assert entry['text'] == markdown_input[1]
     assert entry['title'] == markdown_input[0]
     assert entry['html'] == expected_html
+
+
+def test_get_entry_2(req_context):
+    from journal import get_entry
+    assert get_entry(9874823782374892374) is None
 
 
 def test_edit_entry(req_context):

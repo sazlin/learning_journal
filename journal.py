@@ -68,9 +68,8 @@ def edit_post(post_id):
     if not post_id or 'logged_in' not in session or \
         session['logged_in'] is False:
             return redirect(url_for('show_entries'))
-
     entry = get_entry(post_id)
-    if request.method == 'POST':
+    if request.method == 'POST' and entry is not None:
         try:
             edit_entry(post_id, request.form['title'], request.form['text'])
             return redirect(url_for('show_entries'))
@@ -85,7 +84,10 @@ def get_entry(post_id):
     cur = con.cursor()
     cur.execute(DB_ENTRY_GET, (post_id,))
     keys = ('id', 'title', 'text', 'created')
-    fetched = cur.fetchall()[0]
+    try:
+        fetched = cur.fetchall()[0]
+    except IndexError:
+        return None
     entry = {keys[i]: fetched[i] for i in xrange(len(keys))}
     entry['html'] = _markdown(entry['text'])
     return entry

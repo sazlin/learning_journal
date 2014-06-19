@@ -78,6 +78,19 @@ def edit_post(post_id):
     return render_template('edit_entry.html', entry=entry)
 
 
+# New for Twitter
+@app.route('/view/<int:post_id>', methods=['GET'])
+def view_post(post_id):
+    entry = get_entry(post_id)
+    if entry is not None:
+        # reuse the show_entries view
+        return show_entries([entry])
+    else:
+        abort(404)
+
+    return redirect(url_for('show_entries'))
+
+
 # This is new as of Editing
 def get_entry(post_id):
     con = get_database_connection()
@@ -167,9 +180,11 @@ def write_entry(title, text):
     cur.execute(DB_ENTRY_INSERT, [title, text, now])
 
 
+# edited for Twitter so urls to individual entries can be shared
 @app.route('/')
-def show_entries():
-    entries = get_all_entries()
+def show_entries(entries=None):
+    if entries is None:
+        entries = get_all_entries()
     for entry in entries:
         entry['text'] = _markdown(entry['text'])  # markdown -> html
     return render_template('list_entries.html', entries=entries)

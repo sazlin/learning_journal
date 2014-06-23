@@ -19,6 +19,7 @@
 </aside>
 {% endif %}
   <h2>Entries</h2>
+  <section id="entries">
   {% for entry in entries %}
   <article class="entry" id="entry={{entry.id}}">
     <h3>{{ entry.title }}</h3>
@@ -41,4 +42,5 @@
     <p><em>No entries here so far</em></p>
   </div>
   {% endfor %}
+</section>
 {% endblock %}

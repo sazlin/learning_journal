@@ -134,8 +134,8 @@ def add_entry():
     return jsonify(
         title=entry['title'],
         text=entry['text'],
-        created=entry['created']
-        )
+        created=entry['created'],
+        id=post_id)
     # return entry
 
 
